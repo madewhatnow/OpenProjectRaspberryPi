@@ -158,7 +158,7 @@ Will take 1 minute.
 ## Compile and install OpenProject
 
 Careful - the manual installation I linked to above still uses stable/9, the current release is stable/10 (as of Feb 2020). So, using release stable/10 here, and take note of the bcrypt version, 3.1.13 failes to build. Easiest fix is to edit Gemfile.lock and change the 'bcrypt' line to 3.1.12 (instead of 3.1.13 in my case). 
-If using node 2.6.3, edit Temfile and change the ruby version from 2.6.5 to 2.6.3. 
+If using node 2.6.3, edit the Gemfile and change the ruby version from 2.6.5 to 2.6.3. 
 
 ```
 cd ~
