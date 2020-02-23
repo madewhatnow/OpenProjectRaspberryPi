@@ -57,6 +57,27 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libgdbm-dev libncurses5-dev automake libtool bison libffi-dev git curl poppler-utils unrtf tesseract-ocr catdoc libxml2 libxml2-dev libxslt1-dev memcached postgresql postgresql-contrib libpq-dev
 ```
 
+## Expand filesystem
+Expand the filesystem to take full advantage of the size of SD card chosen;
+Start **raspi-config** and use the first option (**expand filesystem**). 
+Quit.
+
+
+## Increase swap space to 4 GB
+Not actually necessary, but possibly useful for the 2 GB board version (not recommended). Make sure to reverse the setting to avoid burning out the memory card by excessive read/write cycles.
+
+```
+sudo dphys-swapfile swapoff.
+sudo nano /etc/dphys-swapfile 
+***find the CONF_SWAPSIZE=100 line and change to 4096 or similar***
+Start the swap. sudo dphys-swapfile swapon.
+
+sudo dphys-swapfile swapon.
+
+```
+
+## Set up user accounts
+
 Create the openproject group/user. For the standard installation I set 'openproject' as the password.
 
 ```
@@ -65,11 +86,52 @@ sudo useradd --create-home --gid openproject openproject
 sudo passwd openproject #(***pick a password***)
 ```
 
+Switch to the PostgreSQL system user and create the database user. The official documentation creates a user without privileges, the -sd flags will create a superuser with CREATEDB privileges.
+
+```
+sudo su - postgres
+createuser -sd openproject
+```
+Check PostgreSQL users and their privileges. If the CREATE DB privilege is missing, the installation will fail at a later point.
+```
+psql
+\du
+```
+The output should look like this:
+'''
+postgres=# \du
+                                    List of roles
+  Role name  |                         Attributes                         | Member of
+-------------+------------------------------------------------------------+-----------
+ openproject | Superuser, Create role, Create DB                          | {}
+ postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ '''
+ 
+ Create the database and revert to the standard 'pi' user account:
+ 
+ ```
+ createdb -O openproject openproject
+ exit
+ ```
 
 ## Preparing software packages
 
-Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags).
+Following the manual installation suggestions, rbenv is used to install Ruby. Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags).
 
+```
+sudo su openproject --login
+git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
+echo 'eval "$(rbenv init -)"' >> ~/.profile
+source ~/.profile
+git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+MAKE_OPTS="-j 4" rbenv install 2.5.5
+rbenv rehash
+rbenv global 2.5.5
+
+```
+
+rbenv 2.6.1 fails to build, 2.5.5 and 2.7.0 work. 2.7.0 is too new for OpenProject, unless this version is edited into the OpenProject gem file. Possible, but 2.5.5 is fine 
 
 
 ## Compile and install OpenProject
