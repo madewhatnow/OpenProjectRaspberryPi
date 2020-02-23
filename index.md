@@ -306,9 +306,14 @@ sudo a2ensite openproject
 sudo systemctl restart apache2
 ```
 
-And now: OpenProject should be accessible on localhost:80. Congratulations! The standard login should be admin // admin. 
+And now: OpenProject should be accessible on localhost:80. The standard login is admin // admin. 
 
-The final step would be to get background jobs working. This is untested: switch back to the user openproject, and edit crontab:
+## Congratulations!
+
+
+For email notification to work well, background jobs have to be enabled. This is untested. 
+
+Switch back to the user openproject, and edit crontab:
 
 ```
 sudo su --openproject -login
