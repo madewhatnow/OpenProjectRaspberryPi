@@ -176,8 +176,11 @@ npm audit fix
 ```
 
 **gem update --system** will take about 8 minutes.
+
 **bundle install** will take about 5 minutes.
+
 **npm install** will take  15 minutes.
+
 
 ## Prepare config files
 
@@ -196,7 +199,7 @@ production:
   password: openproject
 ```
   
- ### Email & memcache:
+### Email & memcache:
  
 Create an app password for gmail, and include it in the config file. Make sure to keep the .yml layout intact. 
  ```
