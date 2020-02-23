@@ -30,8 +30,9 @@ Or help me fix the last few kinks in the protocol. Any hints & suggestions are a
 
 ## Key issues
 
-* bcrypt 
+* bcrypt 3.1.13 does not build on the Pi, 3.1.12 is fine. See [here](https://github.com/codahale/bcrypt-ruby/issues/201).
 * apache configuration
+* PostgreSQL user privileges are not set correctly when following the 'official' protocol.
 
 ### How to install Openproject on Raspian
 
@@ -98,14 +99,16 @@ psql
 \du
 ```
 The output should look like this:
-'''
+
+```
 postgres=# \du
                                     List of roles
   Role name  |                         Attributes                         | Member of
 -------------+------------------------------------------------------------+-----------
  openproject | Superuser, Create role, Create DB                          | {}
- postgres    | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
- '''
+ postgres    | Superuser, Create role, Creaboglte DB, Replication, Bypass RLS | {}
+```
+
  
  Create the database and revert to the standard 'pi' user account:
  
@@ -116,7 +119,7 @@ postgres=# \du
 
 ## Preparing software packages
 
-Following the manual installation suggestions, rbenv is used to install Ruby. Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags).
+Following the manual installation suggestions, rbenv is used to install Ruby. Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags). These tasks have to be done as the openproject user, hence the **su openproject** command.  
 
 ```
 sudo su openproject --login
@@ -125,16 +128,51 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(rbenv init -)"' >> ~/.profile
 source ~/.profile
 git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-MAKE_OPTS="-j 4" rbenv install 2.5.5
+MAKE_OPTS="-j 4" rbenv install 2.6.5
 rbenv rehash
-rbenv global 2.5.5
+rbenv global 2.6.5
 
 ```
+Will take 15 minutes. 
 
-rbenv 2.6.1 fails to build, 2.5.5 and 2.7.0 work. 2.7.0 is too new for OpenProject, unless this version is edited into the OpenProject gem file. Possible, but 2.5.5 is fine 
+rbenv 2.6.5 and 2.7.0 might work. 2.7.0 is too new for OpenProject, unless this version is edited into the OpenProject gem file. Possible, but 2.6.5 should be simpler. 
 
+Check version with
+```
+ruby --version
+```
+
+Following the manual installation suggestions, nodenv is used to install Ruby. Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags).
+
+```
+git clone https://github.com/OiNutter/nodenv.git ~/.nodenv
+echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.profile
+echo 'eval "$(nodenv init -)"' >> ~/.profile
+source ~/.profile
+git clone git://github.com/OiNutter/node-build.git ~/.nodenv/plugins/node-build
+MAKE_OPTS="-j 4" nodenv install 10.15.2
+nodenv rehash
+nodenv global 10.15.2
+```
+
+Will take 1 minute.  
 
 ## Compile and install OpenProject
+
+Careful - the manual installation I linked to above still uses stable/9, the current release is stable/10 (as of Feb 2020). 
+
+```
+cd ~
+git clone https://github.com/opf/openproject.git --branch stable/10 --depth 1
+cd openproject
+gem update --system 
+gem install bundler
+bundle install --deployment --without mysql2 sqlite development test therubyracer docker
+npm install
+```
+
+**gem update --system** will take about 5 minutes.
+
 
 ## Access OpenProject
 
