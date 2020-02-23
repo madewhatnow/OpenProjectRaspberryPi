@@ -31,7 +31,7 @@ Or help me fix the last few kinks in the protocol. Any hints & suggestions are a
 ## Key issues
 
 * bcrypt 3.1.13 does not build on the Pi, 3.1.12 is fine. See [here](https://github.com/codahale/bcrypt-ruby/issues/201).
-* apache configuration
+* Apache configuration is [outdated](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/).
 * PostgreSQL user privileges are not set correctly when following the 'official' protocol.
 
 ### How to install Openproject on Raspian
@@ -55,7 +55,7 @@ Update the system and install necessary system packages, PostgreSQL and the opti
 ```
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-sudo apt-get install -y zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libgdbm-dev libncurses5-dev automake libtool bison libffi-dev git curl poppler-utils unrtf tesseract-ocr catdoc libxml2 libxml2-dev libxslt1-dev memcached postgresql postgresql-contrib libpq-dev
+sudo apt-get install -y zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libgdbm-dev libncurses5-dev automake libtool bison libffi-dev git curl poppler-utils unrtf tesseract-ocr catdoc libxml2 libxml2-dev libxslt1-dev memcached postgresql postgresql-contrib libpq-dev libsass1 libsass-dev npm nodejs
 ```
 
 ## Expand filesystem
@@ -68,12 +68,12 @@ Quit.
 Not actually necessary, but possibly useful for the 2 GB board version (not recommended). Make sure to reverse the setting to avoid burning out the memory card by excessive read/write cycles.
 
 ```
-sudo dphys-swapfile swapoff.
+sudo dphys-swapfile swapoff
 sudo nano /etc/dphys-swapfile 
 ***find the CONF_SWAPSIZE=100 line and change to 4096 or similar***
 Start the swap. sudo dphys-swapfile swapon.
 
-sudo dphys-swapfile swapon.
+sudo dphys-swapfile swapon
 
 ```
 
@@ -128,14 +128,14 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(rbenv init -)"' >> ~/.profile
 source ~/.profile
 git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-MAKE_OPTS="-j 4" rbenv install 2.6.5
+MAKE_OPTS="-j 4" rbenv install 2.6.3
 rbenv rehash
-rbenv global 2.6.5
+rbenv global 2.6.3
 
 ```
 Will take 15 minutes. 
 
-rbenv 2.6.5 and 2.7.0 might work. 2.7.0 is too new for OpenProject, unless this version is edited into the OpenProject gem file. Possible, but 2.6.5 should be simpler. 
+rbenv 2.6.5 and 2.7.0 might/can work as well. 2.7.0 is too new for OpenProject, unless the 2.7.0 version is edited into the OpenProject gem file. Possible, but 2.6.3 or 2.6.5 are simpler to use. 
 
 Check version with
 ```
@@ -150,31 +150,93 @@ echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(nodenv init -)"' >> ~/.profile
 source ~/.profile
 git clone git://github.com/OiNutter/node-build.git ~/.nodenv/plugins/node-build
-MAKE_OPTS="-j 4" nodenv install 10.15.2
+MAKE_OPTS="-j 4" nodenv install 13.7.0
 nodenv rehash
-nodenv global 10.15.2
+nodenv global 13.7.0
 ```
 
 Will take 1 minute.  
 
 ## Compile and install OpenProject
 
-Careful - the manual installation I linked to above still uses stable/9, the current release is stable/10 (as of Feb 2020). 
+Careful - the manual installation I linked to above still uses stable/9, the current release is stable/10 (as of Feb 2020). So, using release stable/10 here, and take note of the bcrypt version, 3.1.13 failes to build. Easiest fix is to edit Gemfile.lock and change the 'bcrypt' line to 3.1.12 (instead of 3.1.13 in my case). 
+If using node 2.6.3, edit Temfile and change the ruby version from 2.6.5 to 2.6.3. 
 
 ```
 cd ~
 git clone https://github.com/opf/openproject.git --branch stable/10 --depth 1
 cd openproject
+nano Gemfile.lock
+**edit the bcrypt line and change the gem version from (probably) 3.1.13 to 3.1.12**
+nano Gemfile
+**edit the ruby line and change the version from (probably) 2.6.5 to 2.6.3**
 gem update --system 
 gem install bundler
-bundle install --deployment --without mysql2 sqlite development test therubyracer docker
+bundle install --deployment --without mysql2 sqlite development test therubyracer docker 
 npm install
+npm audit fix
 ```
 
-**gem update --system** will take about 5 minutes.
+**gem update --system** will take about 8 minutes.
+**bundle install** will take about 5 minutes.
+**npm install** will take  15 minutes.
+
+## Prepare config files
+
+###Database:
+```
+cp config/database.yml.example config/database.yml
+nano config/database.yml
+```
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: openproject
+  pool: 20
+  username: openproject
+  password: openproject
+  
+ ### Email & memcache:
+ 
+Create an app password for gmail, and include it in the config file. Make sure to keep the .yml layout intact. 
+ ```
+   cp config/configuration.yml.example config/configuration.yml
+ nano config/configuration.yml
+ ```
+
+production:                          
+  smtp_address: smtp.gmail.com
+  smtp_port: 587
+  smtp_domain: smtp.gmail.com
+  smtp_user_name: **@gmail.com**
+  smtp_password: **set app password here**
+  smtp_enable_starttls_auto: true
+  smtp_authentication: plain
+  
+** Add at the end of the file:**
+ 
+ rails_cache_store: :memcache
+ 
+ 
+## Setup OpenProject
+Set secret key and store in environmental variable SECRET_KEY_BASE. 
+
+```
+cd ~/openproject
+echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
+source ~/.profile
+RAILS_ENV="production" ./bin/rake db:create
+RAILS_ENV="production" ./bin/rake db:migrate
+RAILS_ENV="production" ./bin/rake db:seed
+RAILS_ENV="production" ./bin/rake assets:precompile
+```
+Last one is the slow one - expect to wait for xx minutes. 
 
 
-## Access OpenProject
+## Install Apache & Passenger
+
+
 
 
 
