@@ -15,9 +15,11 @@ for a power-efficient and compact solution to run a server for at least a small 
 
 The downside? OpenProject does not support the ARM architecture, so any described methods based on .deb/.rpm or docker fails miserably. But if you found this page, your probably know all about that anyway. 
 
-## Good news: OpenProject with ARM works!
+## Good news: OpenProject work on ARM (unofficially, at least)!
 
 It's actually possible to get OpenProject working on a Raspberry Pi. I'd highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that's something I haven't tested yet. 
+
+## Status (Feb 2020)
 
 As of now, my OpenProject Raspberry Pi server has an uptime of about 2 weeks, without any obvious problems, good responsibility and no issues. 
 
@@ -26,4 +28,10 @@ The downside? Consider this installation protocol an 'alpha' version. I seem to 
 Github doesn't allow me to upload a prepared system image, but if you send me a message I can supply a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, and you are good to go. 
 
 Or help me fix the last few kinks in the protodcol. Any hints & tips are appreciated. 
+
+## How to install Openproject on Raspian
+
+This protocol is based on the somewhat outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/).
+
+
 
