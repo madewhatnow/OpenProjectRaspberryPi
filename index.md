@@ -105,6 +105,8 @@ postgres=# \du
 -------------+------------------------------------------------------------+-----------
  openproject | Superuser, Create role, Create DB                          | {}
  postgres    | Superuser, Create role, Creaboglte DB, Replication, Bypass RLS | {}
+ 
+ exit
 ```
 
  
