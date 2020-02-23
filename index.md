@@ -298,7 +298,7 @@ SetEnv EXECJS_RUNTIME Disabled
 </VirtualHost>
 ```
 
-Then, still as root perform the fix as described [here](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/)
+Then, still as root, perform the fix as described [here](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/)
 ```
 ln -s /etc/apache2/mods-available/expires.load /etc/apache2/mods-enabled/
 sudo a2dissite 000-default
