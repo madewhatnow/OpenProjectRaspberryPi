@@ -89,7 +89,7 @@ Switch to the PostgreSQL system user and create the database user. The official 
 
 ```
 sudo su - postgres
-createuser -sd openproject
+createuser -dW openproject
 ```
 Check PostgreSQL users and their privileges. If the CREATE DB privilege is missing, the installation will fail at a later point.
 ```
