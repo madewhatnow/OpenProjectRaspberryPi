@@ -181,7 +181,7 @@ npm audit fix
 
 ## Prepare config files
 
-###Database:
+### Database:
 ```
 cp config/database.yml.example config/database.yml
 nano config/database.yml
