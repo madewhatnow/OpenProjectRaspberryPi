@@ -186,7 +186,7 @@ npm audit fix
 cp config/database.yml.example config/database.yml
 nano config/database.yml
 ```
-
+```
 production:
   adapter: postgresql
   encoding: unicode
@@ -194,6 +194,7 @@ production:
   pool: 20
   username: openproject
   password: openproject
+```
   
  ### Email & memcache:
  
@@ -202,19 +203,20 @@ Create an app password for gmail, and include it in the config file. Make sure t
    cp config/configuration.yml.example config/configuration.yml
  nano config/configuration.yml
  ```
-
+ ```
 production:                          
   smtp_address: smtp.gmail.com
   smtp_port: 587
   smtp_domain: smtp.gmail.com
   smtp_user_name: **@gmail.com**
-  smtp_password: **set app password here**
+  smtp_password: **enter gsuite app password here**
   smtp_enable_starttls_auto: true
   smtp_authentication: plain
   
 ** Add at the end of the file:**
  
  rails_cache_store: :memcache
+ ```
  
  
 ## Setup OpenProject
