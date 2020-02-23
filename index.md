@@ -10,24 +10,28 @@
 open source and with a free community version, although some premium features are limited to the paid-for cloud & enterprise versions. 
 If you want to run your own server, the project suggests a Linux-based server with 4 GB RAM, and supplies various .deb/.rpm packages, or docker images for easy installation.
 
-The newer Raspberry Pi 4 boards are compact and power efficient, and with 4 cores & 4 GB of RAM at least on paper look capable of running OpenProject, making
-for a power-efficient and compact solution to run a server for at least a small team. 
+The newer Raspberry Pi 4 boards are compact and power efficient, and with 4 cores & 4 GB of RAM at least on paper look capable of running OpenProject. This would make for a very power-efficient and compact solution for (at least) small teams or local test installations.  
 
-The downside? OpenProject does not support the ARM architecture, so any described methods based on .deb/.rpm or docker fails miserably. But if you found this page, your probably know all about that anyway. 
+The downside? OpenProject officially does not support the ARM architecture, so any described installation methods based on .deb/.rpm packages or docker fails miserably. The support forum has a few threads on this dating back several years, but little to no help on making this happen. But if you found this page, your probably know all about that already. 
 
-## Good news: OpenProject work on ARM (unofficially, at least)!
+## Good news: OpenProject runs on ARM (unofficially, at least)!
 
-It's actually possible to get OpenProject working on a Raspberry Pi. I'd highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that's something I haven't tested yet. 
+It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that's something I haven't tested yet, and seems ill advised. During the installation and compilation process, memory usage maxes out at about 3.1 Gb. 
 
 ## Status (Feb 2020)
 
-As of now, my OpenProject Raspberry Pi server has an uptime of about 2 weeks, without any obvious problems, good responsibility and no issues. 
+As of now, my OpenProject Raspberry Pi server has an uptime of about 2 weeks, good responsiveness and no issues worth talking about. 
 
-The downside? Consider this installation protocol an 'alpha' version. I seem to invariably run into a problem where (independently of which ruby/npm/gem versions I start out with) OpenProject doesn't compile correctly, and after changing npm/ruby versions a couple of times, it suddenly works. Which makes this obviously a pretty rough instruction set.
+The downside? Consider this installation protocol an 'alpha' version. It takes 4 to 6 hours to go through, and I seem to invariably run into a problem where (independently of which ruby/npm/gem versions I start out with) OpenProject does initially not compile, usually due to a SASS-related problem. After changing npm/ruby versions a couple of times it suddenly works. I am fully aware that this 'bug' makes this a rather rough guide. 
 
-Github doesn't allow me to upload a prepared system image, but if you send me a message I can supply a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, and you are good to go. 
+Github doesn't allow me to upload a prepared system image, but if you send me a message I can give a link to a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, change the passwords and you are good to go. 
 
-Or help me fix the last few kinks in the protodcol. Any hints & tips are appreciated. 
+Or help me fix the last few kinks in the protocol. Any hints & suggestions are appreciated. 
+
+## Key issues
+
+* bcrypt 
+* apache configuration
 
 ## How to install Openproject on Raspian
 
