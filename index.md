@@ -230,14 +230,95 @@ RAILS_ENV="production" ./bin/rake db:create
 RAILS_ENV="production" ./bin/rake db:migrate
 RAILS_ENV="production" ./bin/rake db:seed
 RAILS_ENV="production" ./bin/rake assets:precompile
+exit
 ```
-Last one is the slow one - expect to wait for xx minutes. 
+Last one is the slow one - expect to wait for 15 minutes. 
 
 
 ## Install Apache & Passenger
 
+```
+sudo apt-get install -y apache2 libcurl4-gnutls-dev apache2-dev libapr1-dev libaprutil1-dev
+sudo chmod o+x "/home/openproject"
+sudo su openproject --login
+cd ~/openproject
+gem install passenger
+passenger-install-apache2-module
+```
+This will, again, take a while - expect 20 minutes. 
 
+Once passenger is nearly done it lists the config information for Apache2. Open a second shell as root (or copy the lines into a text editor) and perform the edits as given. Use the information below as a guideline, the actual ones are likely to be different! Raspian uses a split Apache2 configuration, where information is spread out in several files (and not centralized in /etc/apache.conf)
+Install passenger for 'ruby', when asked. 
 
+In  /etc/apache2/mods-available/passenger.load:
+```
+LoadModule passenger_module /home/openproject/.rbenv/versions/2.6.3/lib/ruby/gems/2.6.0/gems/passenger-6.0.4/buildout/apache2/mod_passenger.so
+```
+
+In /etc/apache2/mods-available/passenger.conf:
+```
+<IfModule mod_passenger.c>
+     PassengerRoot /home/openproject/.rbenv/versions/2.6.3/lib/ruby/gems/2.6.0/gems/passenger-6.0.4
+     PassengerDefaultRuby /home/openproject/.rbenv/versions/2.6.3/bin/ruby
+</IfModule>
+
+```
+
+Then, still as root:
+```
+sudo a2enmod passenger
+sudo systemctl restart apache2
+```
+
+Create the /etc/apache2/sites-available/openproject.conf file:
+```
+SetEnv EXECJS_RUNTIME Disabled
+
+<VirtualHost *:80>
+   ServerName yourdomain.com
+   # !!! Be sure to point DocumentRoot to 'public'!
+   DocumentRoot /home/openproject/openproject/public
+   <Directory /home/openproject/openproject/public>
+      # This relaxes Apache security settings.
+      AllowOverride all
+      # MultiViews must be turned off.
+      Options -MultiViews
+      # Uncomment this if you're on Apache >= 2.4:
+      Require all granted
+   </Directory>
+
+   # Request browser to cache assets
+   <Location /assets/>
+     ExpiresActive On ExpiresDefault "access plus 1 year"
+   </Location>
+
+</VirtualHost>
+```
+
+Then, still as root perform the fix as described [here](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/)
+```
+ln -s /etc/apache2/mods-available/expires.load /etc/apache2/mods-enabled/
+sudo a2dissite 000-default
+sudo a2ensite openproject
+sudo systemctl restart apache2
+```
+
+And now: OpenProject should be accessible on localhost:80. Congratulations! The standard login should be admin // admin. 
+
+The final step would be to get background jobs working. This is untested: switch back to the user openproject, and edit crontab:
+
+```
+sudo su --openproject -login
+crontab -e **select the editor of choice if required**
+```
+
+Insert the following line at the end of the file, make sure to use the correct Ruby version:
+
+```
+*/1 * * * * cd /home/openproject/openproject; /home/openproject/.rvm/gems/ruby-2.6.3/wrappers/rake jobs:workoff
+```
+
+Save & reboot. Enjoy. 
 
 
 
