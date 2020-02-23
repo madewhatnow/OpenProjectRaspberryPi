@@ -49,7 +49,28 @@ Assuming that access via SSH & the local wifi network is required:
 
 Raspian standard username // password is: pi // raspberry
 
+Update the system and install necessary system packages, PostgreSQL and the optional memcached package):
+
+```
+sudo apt-get update -y
+sudo apt-get full-upgrade -y
+sudo apt-get install -y zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libgdbm-dev libncurses5-dev automake libtool bison libffi-dev git curl poppler-utils unrtf tesseract-ocr catdoc libxml2 libxml2-dev libxslt1-dev memcached postgresql postgresql-contrib libpq-dev
+```
+
+Create the openproject group/user. For the standard installation I set 'openproject' as the password.
+
+```
+sudo groupadd openproject
+sudo useradd --create-home --gid openproject openproject
+sudo passwd openproject #(***pick a password***)
+```
+
+
 ## Preparing software packages
+
+Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags).
+
+
 
 ## Compile and install OpenProject
 
