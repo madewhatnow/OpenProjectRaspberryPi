@@ -308,7 +308,7 @@ sudo a2ensite openproject
 sudo systemctl restart apache2
 ```
 
-And now: OpenProject should be accessible on localhost:80. The standard login is admin // admin. 
+And now: OpenProject should be accessible on **raspberry_pi-IP**:80. The standard login is admin // admin. 
 
 ## Congratulations!
 
