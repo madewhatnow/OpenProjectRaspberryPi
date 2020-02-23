@@ -33,9 +33,31 @@ Or help me fix the last few kinks in the protocol. Any hints & suggestions are a
 * bcrypt 
 * apache configuration
 
-## How to install Openproject on Raspian
+### How to install Openproject on Raspian
 
 This protocol is based on the somewhat outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/).
+
+## Setting up the Raspberry and Raspian Buster
+
+Download a [Raspian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/) system image and [flash](https://www.balena.io/etcher/) it on a microSD card (I'm using a fast 32 GB one, smaller is fine too).
+
+Assuming that access via SSH & the local wifi network is required:
+
+* Create an empty SSH file to enable [shell access](https://www.raspberrypi.org/documentation/remote-access/ssh/) (or hook up the Pi to a keyboard, mouse & display directly). 
+* Create an [wpa_supplicant.conf](https://www.raspberrypi.org/documentation/configuration/wireless/headless.md) file with the correct credentials for the local wifi (or hook the Pi up to a LA).
+* Check your router for the IP address of the Pi, and use this to log in using your favourite SSH client (Putty, etc)
+
+Raspian standard username // password is: pi // raspberry
+
+## Preparing software packages
+
+## Compile and install OpenProject
+
+## Access OpenProject
+
+
+
+
 
 
 
