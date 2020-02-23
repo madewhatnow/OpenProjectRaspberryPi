@@ -6,23 +6,23 @@
 
 ### Introduction
 
-[OpenProject](https://www.openproject.org/) is a fully features project management toolbox, 
-open source and with a free community version, although some premium features are limited to the paid-for cloud & enterprise versions. 
-If you want to run your own server, the project suggests a Linux-based server with 4 GB RAM, and supplies various .deb/.rpm packages, or docker images for easy installation.
+[OpenProject](https://www.openproject.org/) is a fully featured, open source project management toolbox.  
+A free community version has been released, but some premium features are limited to the paid-for cloud & enterprise versions. 
+If you want to run your own server, the project suggests a Linux-based system with 4 GB RAM, and supplies various .deb/.rpm packages, or docker images for easy installation. 
 
 The newer Raspberry Pi 4 boards are compact and power efficient, and with 4 cores & 4 GB of RAM at least on paper look capable of running OpenProject. This would make for a very power-efficient and compact solution for (at least) small teams or local test installations.  
 
-The downside? OpenProject officially does not support the ARM architecture, so any described installation methods based on .deb/.rpm packages or docker fails miserably. The support forum has a few threads on this dating back several years, but little to no help on making this happen. But if you found this page, your probably know all about that already. 
+The problem? OpenProject officially does not support the ARM architecture, so any described installation methods based on .deb/.rpm packages or docker fail miserably. The support forum has a few threads on this dating back several years, but little to no help has been forthcoming to to make this happen. But if you found this page, your probably know all about that already. 
 
 ## Good news: OpenProject runs on ARM (unofficially, at least)!
 
-It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that's something I haven't tested yet, and seems ill advised. During the installation and compilation process, memory usage maxes out at about 3.1 Gb. 
+It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that would be untested as of now, and seems ill advised. During the installation and compilation process, memory usage maxes out at about 3.1 GB. 
 
 ## Status (Feb 2020)
 
 As of now, my OpenProject Raspberry Pi server has an uptime of about 2 weeks, good responsiveness and no issues worth talking about. 
 
-The downside? Consider this installation protocol an 'alpha' version. It takes 4 to 6 hours to go through, and I seem to invariably run into a problem where (independently of which ruby/npm/gem versions I start out with) OpenProject does initially not compile, usually due to a SASS-related problem. After changing npm/ruby versions a couple of times it suddenly works. I am fully aware that this 'bug' makes this a rather rough guide. 
+Caveats? Consider this installation protocol an 'alpha' version. It takes 4 to 6 hours to go through, and I seem to invariably run into a problem where (independently of which ruby/npm/gem versions I start out with) OpenProject does initially not compile, usually due to a SASS-related problem. After changing npm/ruby versions a couple of times it suddenly works. I am fully aware that this 'bug' makes this a rather rough guide. 
 
 Github doesn't allow me to upload a prepared system image, but if you send me a message I can give a link to a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, change the passwords and you are good to go. 
 
@@ -33,10 +33,11 @@ Or help me fix the last few kinks in the protocol. Any hints & suggestions are a
 * bcrypt 3.1.13 does not build on the Pi, 3.1.12 is fine. See [here](https://github.com/codahale/bcrypt-ruby/issues/201).
 * Apache configuration is [outdated](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/).
 * PostgreSQL user privileges are not set correctly when following the 'official' protocol.
+* Ruby version 2.6.3 and 2.7.0 appear to work, but both require edits to the Gemfile or Gemfile.lock. 2.6.5 might be problematic. 
 
 ### How to install Openproject on Raspian
 
-This protocol is based on the somewhat outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/).
+This protocol is based on the somewhat outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/). By now it has a few issues, but it does spend more time explaining the various steps. 
 
 ## Setting up the Raspberry and Raspian Buster
 
@@ -50,7 +51,7 @@ Assuming that access via SSH & the local wifi network is required:
 
 Raspian standard username // password is: pi // raspberry
 
-Update the system and install necessary system packages, PostgreSQL and the optional memcached package):
+Update the system and install necessary system packages, PostgreSQL and the optional memcached package). Installing npm and nodejs here is probably redundant, but it looks like this works. Drop them at your own risk. 
 
 ```
 sudo apt-get update -y
@@ -60,21 +61,18 @@ sudo apt-get install -y zlib1g-dev build-essential libssl-dev libreadline-dev li
 
 ## Expand filesystem
 Expand the filesystem to take full advantage of the size of SD card chosen;
-Start **raspi-config** and use the first option (**expand filesystem**). 
-Quit.
+Start **raspi-config** and go to **advanced options**, **expand filesystem**.  
+Quit and reboot.
 
 
 ## Increase swap space to 4 GB
-Not actually necessary, but possibly useful for the 2 GB board version (not recommended). Make sure to reverse the setting to avoid burning out the memory card by excessive read/write cycles.
+Not actually necessary, but possibly useful for the 2 GB board version (not recommended). Make sure to reverse the setting after the installation to avoid burning out the memory card by excessive read/write cycles.
 
 ```
 sudo dphys-swapfile swapoff
 sudo nano /etc/dphys-swapfile 
 ***find the CONF_SWAPSIZE=100 line and change to 4096 or similar***
-Start the swap. sudo dphys-swapfile swapon.
-
 sudo dphys-swapfile swapon
-
 ```
 
 ## Set up user accounts
@@ -119,10 +117,10 @@ postgres=# \du
 
 ## Preparing software packages
 
-Following the manual installation suggestions, rbenv is used to install Ruby. Whenever possible, I use all four cores to speed up compiling (watch out for the **-j 4** flags). These tasks have to be done as the openproject user, hence the **su openproject** command.  
+Following the manual installation suggestions, rbenv is used to install Ruby. Whenever possible, I use all four cores to speed up compiling (hence the **-j 4** flags). These tasks have to be done as the openproject user, hence the **su -- openproject** command.  
 
 ```
-sudo su openproject --login
+sudo su -- openproject -login
 git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(rbenv init -)"' >> ~/.profile
@@ -135,7 +133,7 @@ rbenv global 2.6.3
 ```
 Will take 15 minutes. 
 
-rbenv 2.6.5 and 2.7.0 might/can work as well. 2.7.0 is too new for OpenProject, unless the 2.7.0 version is edited into the OpenProject gem file. Possible, but 2.6.3 or 2.6.5 are simpler to use. 
+rbenv 2.6.5 and 2.7.0 might work as well. 2.7.0 is too new for OpenProject, unless the 2.7.0 version is forced by editing the OpenProject gem file. 2.6.3 or 2.6.5 are simpler to use, I would recommend 2.6.3 for now. 
 
 Check version with
 ```
