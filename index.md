@@ -339,6 +339,8 @@ And obviously, if you plan to make this installation available on any sort of ne
 
 ## Troubleshooting
 
+2020/02/23 Sometimes an error is thrown when DB:seed is performed, which doesn't disrupt the installation process outright, but causes the admin account to not be created. I suspect this is caused by a misformated/bad config file, troubleshooting is ongoing. 
+
 
 
 
