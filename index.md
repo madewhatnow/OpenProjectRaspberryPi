@@ -222,12 +222,21 @@ production:
  
  rails_cache_store: :memcache
  ```
- 
- 
+
+## Ensure host lookup can be performed
+
+As user pi (exit the openproject account):
+```
+sudo chmod o+r /etc/resolv.conf
+sudo chmod o+r /etc/hosts
+```
+
+  
 ## Setup OpenProject
 Set secret key and store in environmental variable SECRET_KEY_BASE. 
 
 ```
+sudo su -- openproject -login
 cd ~/openproject
 echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
 source ~/.profile
@@ -339,8 +348,17 @@ And obviously, if you plan to make this installation available on any sort of ne
 
 ## Troubleshooting
 
-2020/02/23 Sometimes an error is thrown when DB:seed is performed, which doesn't disrupt the installation process outright, but causes the admin account to not be created. I suspect this is caused by a misformated/bad config file, troubleshooting is ongoing. 
+2020/02/25
 
+### I made it through the process, the openproject login page shows up, but I cannot use the admin // admin login. 
+
+You might have missed an error that triggered during the **RAILS_ENV="production" ./bin/rake db:seed** step. When the WorkPackages section is executed, a **getaddrinfo** error is triggered, and **rake aborted** is displayed. 
+This can be easily fixed by executing the following commands as a superuser (e.g. from the pi account), to make sure that /etc/hosts and /etc/resolv.conf can be read by all users. This step is included in the instruction above as of 02/25/2020. 
+
+```
+sudo chmod o+r /etc/resolv.conf
+sudo chmod o+r /etc/hosts
+```
 
 
 
