@@ -353,7 +353,7 @@ And obviously, if you plan to make this installation available on any sort of ne
 ### I made it through the process, the openproject login page shows up, but I cannot use the admin // admin login. 
 
 You might have missed an error that triggered during the **RAILS_ENV="production" ./bin/rake db:seed** step. When the WorkPackages section is executed, a **getaddrinfo** error is triggered, and **rake aborted** is displayed. 
-This can be easily fixed by executing the following commands as a superuser (e.g. from the pi account), to make sure that /etc/hosts and /etc/resolv.conf can be read by all users. This step is included in the instruction above as of 02/25/2020. 
+This can be easily fixed by executing the following commands as a superuser (e.g. from the pi account), to make sure that /etc/hosts and /etc/resolv.conf can be read by all users. This step is included in the instruction above as of 2020/02/25. 
 
 ```
 sudo chmod o+r /etc/resolv.conf
