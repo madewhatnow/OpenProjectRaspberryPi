@@ -359,8 +359,25 @@ This can be easily fixed by executing the following commands as a superuser (e.g
 sudo chmod o+r /etc/resolv.conf
 sudo chmod o+r /etc/hosts
 ```
+### I still cannot login with admin // admin
 
+You can manually change the password for the admin account by opening an IRB terminal. This is generally useful if a user forgot their password, and outlined originally [here](https://community.openproject.com/topics/6584).
 
+As the openproject user, open an IRB shell:
+
+```
+cd ~/openproject
+RAILS_ENV=production bundle exec rails c
+```
+Once the console is open, type out the following:
+```
+admin = User.find_by(login: 'admin')
+admin.password = 'RaspberryPi' # Must confirm to the password rules you defined!
+admin.password_confirmation = 'RaspberryPi'
+
+admin.save! # Watch the output for errors
+```
+The final command should return 'true'. Use the new password to login. h
 
 
 
