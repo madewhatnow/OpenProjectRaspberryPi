@@ -377,7 +377,7 @@ admin.password_confirmation = 'RaspberryPi'
 
 admin.save! # Watch the output for errors
 ```
-The final command should return 'true'. Use the new password to login. h
+The final command should return 'true'. Use the new password to login.
 
 
 
