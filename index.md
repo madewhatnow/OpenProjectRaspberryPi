@@ -379,4 +379,8 @@ Background jobs are probably not activated, follow these steps:
 
 https://docs.openproject.org/installation-and-operations/installation/manual/
 
+### More questions?
+
+Email or ask here: https://community.openproject.com/topics/6873
+
 
