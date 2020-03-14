@@ -373,7 +373,7 @@ admin.save! # Watch the output for errors
 ```
 The final command should return 'true'. Use the new password to login.
 
-### Test emails work, but notificatiosn don't arrive
+### Test emails work, but notifications don't arrive
 
 Background jobs are probably not activated, follow these steps: 
 
