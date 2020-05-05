@@ -343,6 +343,7 @@ And obviously, if you plan to make this installation available on any sort of ne
 
 2020/02/25
 2020/02/26
+2020/05/05
 
 ### I made it through the process, the openproject login page shows up, but I cannot use the admin // admin login. 
 
@@ -372,6 +373,11 @@ admin.password_confirmation = 'RaspberryPi'
 admin.save! # Watch the output for errors
 ```
 The final command should return 'true'. Use the new password to login.
+
+### I see an error message when accessing the login page
+"Could not spawn process for application /home/openproject/openproject: A timeout occurred while starting a preloader process."
+
+Discovered, solved & reported by Matteo Nespoli (thanks!): Add "PassengerStartTimeout 200" line to passenger.conf, as outlined here: https://community.bitnami.com/t/openproject-8-3-2-0-stack-not-working-after-fresh-install/67444/12
 
 ### Test emails work, but notifications don't arrive
 
