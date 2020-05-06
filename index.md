@@ -374,7 +374,7 @@ admin.save! # Watch the output for errors
 ```
 The final command should return 'true'. Use the new password to login.
 
-### I see an error message when accessing the login page
+### Error page when accessing the login page & error message the error log:
 "Could not spawn process for application /home/openproject/openproject: A timeout occurred while starting a preloader process."
 
 Discovered, solved & reported by Matteo Nespoli (thanks!): Add "PassengerStartTimeout 200" line to passenger.conf, as outlined here: https://community.bitnami.com/t/openproject-8-3-2-0-stack-not-working-after-fresh-install/67444/12
