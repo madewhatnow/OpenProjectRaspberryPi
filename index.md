@@ -18,28 +18,29 @@ The problem? OpenProject officially does not support the ARM architecture, so an
 
 It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that would be untested as of now, and seems ill advised. During the installation and compilation process, memory usage maxes out at about 3.1 GB. 
 
-## Status (Feb 2020)
+## Status (Aug 2020)
 
-As of now, my OpenProject Raspberry Pi server has an uptime of about 2 weeks, good responsiveness and no issues worth talking about. 
+As of now, my OpenProject Raspberry Pi server has an uptime of several weeks, good responsiveness and no issues worth talking about. I have one report of the pdf export not working. 
 
-Caveats? Consider this installation protocol an 'alpha' version. It takes 4 to 6 hours to go through, and I seem to invariably run into a problem where (independently of which ruby/npm/gem versions I start out with) OpenProject does initially not compile, usually due to a SASS-related problem. After changing npm/ruby versions a couple of times it suddenly works. I am fully aware that this 'bug' makes this a rather rough guide. 
+Other caveats? Consider this installation protocol an 'alpha' version, it takes a few hours to go through. With Rasperyy OS (Buster lite), a few changes to the protocol and some different version I see fewer errors and warnings. I've also accidentally ignored a whole bunch of emails about the image - really sorry! A download link to the image is now included:
 
-Github doesn't allow me to upload a prepared system image, but if you send me a message I can give a link to a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, change the passwords and you are good to go. 
+The image uses the standard Raspberry OS (formerly: Raspian login of pi // raspberry) and has SSH enabled. Wifi can be enabled by editing the wpa-supplicant file in /boot.
+The openproject installation is blank, and has the admin user active as admin // mynewpassword1234. THe database runs on as openproject // openproject. Obviously, none of these passwords are good ideas and should be changed. The configuration files will also have to be edited to make email notifications work. 
 
-Or help me fix the last few kinks in the protocol. Any hints & suggestions are appreciated. 
+Feel free to help me fix any kinks in the protocol. Any hints & suggestions are appreciated!
 
 ## Key issues
 
 * bcrypt 3.1.13 does not build on the Pi, 3.1.12 is fine. See [here](https://github.com/codahale/bcrypt-ruby/issues/201).
 * Apache configuration is [outdated](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/).
 * PostgreSQL user privileges are not set correctly when following the 'official' protocol.
-* Ruby version 2.6.3 and 2.7.0 appear to work, but both require edits to the Gemfile or Gemfile.lock. 2.6.5 might be problematic. 
+* Ruby 2.6.5 is the prefered version. Ruby version 2.6.3 and 2.7.0 appear to work, but both require edits to the Gemfile or Gemfile.lock. 2.6.5 might be problematic. 
 
-### How to install Openproject on Raspian
+### How to install Openproject on Raspberry OS (Raspian)
 
 This protocol is based on the somewhat outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/). By now it has a few issues, but it does spend more time explaining the various steps. 
 
-## Setting up the Raspberry and Raspian Buster
+## Setting up the Raspberry and Raspberry OS / Raspian Buster
 
 Download a [Raspian Buster Lite](https://www.raspberrypi.org/downloads/raspbian/) system image and [flash](https://www.balena.io/etcher/) it on a microSD card (I'm using a fast 32 GB one, smaller is fine too).
 
@@ -89,7 +90,7 @@ Switch to the PostgreSQL system user and create the database user. The official 
 
 ```
 sudo su - postgres
-createuser -dW openproject
+createuser -dWs openproject
 ```
 Check PostgreSQL users and their privileges. If the CREATE DB privilege is missing, the installation will fail at a later point.
 ```
@@ -128,9 +129,9 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(rbenv init -)"' >> ~/.profile
 source ~/.profile
 git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-MAKE_OPTS="-j 4" rbenv install 2.6.3
+MAKE_OPTS="-j 4" rbenv install 2.6.5
 rbenv rehash
-rbenv global 2.6.3
+rbenv global 2.6.5
 
 ```
 Will take 15 minutes. 
@@ -150,9 +151,9 @@ echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(nodenv init -)"' >> ~/.profile
 source ~/.profile
 git clone git://github.com/OiNutter/node-build.git ~/.nodenv/plugins/node-build
-MAKE_OPTS="-j 4" nodenv install 13.7.0
+MAKE_OPTS="-j 4" nodenv install 13.14.0
 nodenv rehash
-nodenv global 13.7.0
+nodenv global 13.14.0
 ```
 
 Will take 1 minute.  
@@ -259,15 +260,17 @@ Install passenger for 'ruby', when asked.
 
 In  /etc/apache2/mods-available/passenger.load:
 ```
-LoadModule passenger_module /home/openproject/.rbenv/versions/2.6.3/lib/ruby/gems/2.6.0/gems/passenger-6.0.4/buildout/apache2/mod_passenger.so
+ LoadModule passenger_module /home/openproject/.rbenv/versions/2.6.5/lib/ruby/gems/2.6.0/gems/passenger-6.0.6/buildout/apache2/mod_passenger.so
+
 ```
 
 In /etc/apache2/mods-available/passenger.conf:
 ```
-<IfModule mod_passenger.c>
-     PassengerRoot /home/openproject/.rbenv/versions/2.6.3/lib/ruby/gems/2.6.0/gems/passenger-6.0.4
-     PassengerDefaultRuby /home/openproject/.rbenv/versions/2.6.3/bin/ruby
-</IfModule>
+ <IfModule mod_passenger.c>
+     PassengerRoot /home/openproject/.rbenv/versions/2.6.5/lib/ruby/gems/2.6.0/gems/passenger-6.0.6
+     PassengerDefaultRuby /home/openproject/.rbenv/versions/2.6.5/bin/ruby
+   </IfModule>
+
 
 ```
 
@@ -327,7 +330,7 @@ crontab -e **select the editor of choice if required**
 Insert the following line at the end of the file, make sure to use the correct Ruby version:
 
 ```
-*/1 * * * * cd /home/openproject/openproject; /home/openproject/.rvm/gems/ruby-2.6.3/wrappers/rake jobs:workoff
+*/1 * * * * cd /home/openproject/openproject; /home/openproject/.rvm/gems/ruby-2.6.5/wrappers/rake jobs:workoff
 ```
 
 Save & reboot. Enjoy. 
@@ -341,20 +344,14 @@ And obviously, if you plan to make this installation available on any sort of ne
 
 ## Troubleshooting
 
+2020/08/20
 2020/02/25
 2020/02/26
 2020/05/05
 
-### I made it through the process, the openproject login page shows up, but I cannot use the admin // admin login. 
+### Passenger fails to start, and there is an obscure error message in /var/log/apache2/error.log that mentions 'end time 
 
-You might have missed an error that triggered during the **RAILS_ENV="production" ./bin/rake db:seed** step. When the WorkPackages section is executed, a **getaddrinfo** error is triggered, and **rake aborted** is displayed. 
-This can be easily fixed by executing the following commands as a superuser (e.g. from the pi account), to make sure that /etc/hosts and /etc/resolv.conf can be read by all users. This doesn't seem to reliably fix the problem - removed from the above instructions. 2020/02/26 
-
-```
-sudo chmod o+r /etc/resolv.conf
-sudo chmod o+r /etc/hosts
-```
-### I still cannot login with admin // admin
+### I cannot login with admin // admin after the installation
 
 You can manually change the password for the admin account by opening an IRB terminal. This is generally useful if a user forgot their password, and outlined originally [here](https://community.openproject.com/topics/6584).
 
