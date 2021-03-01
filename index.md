@@ -20,7 +20,7 @@ It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a
 
 ## Status (Feb 2021)
 
-I original wrote the instructions in Feb 2020, for OpenProject 10 - and while they (mostly) worked, they were still somewhat buggy in an unpredictable way. I have a received a surprising amount of email asking for the system image, or various fixed, and finally revisited the protocol in 2021. OpenProject recently released version 11 - and somewhat surprisingly, in 2021 this process is a lot smoother. Starting with a Raspian Lite image on a  RPi 4, the whole process was done in a few hours, with minimal issues. The protocol below is updated to reflect the required changes. 
+I original wrote the instructions in February 2020, for OpenProject 10 - and while they (mostly) worked, they were still somewhat buggy in an unpredictable way. I have received a surprising amount of emails asking for the system image, or various fixes, and finally revisited the protocol in 2021. OpenProject recently released version 11 - and somewhat surprisingly, in 2021 the process is a lot smoother. Starting with a Raspian Lite image on a  RPi 4, the whole process was done in a few hours, with minimal issues. The protocol below is updated to reflect the required changes. 
 
 Github doesn't allow me to upload a prepared system image, but if you send me a message I can give a link to a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, change the passwords and you are good to go. 
 
@@ -32,7 +32,7 @@ Or help me fix the last few kinks in the protocol. Any hints & suggestions are a
 
 ### How to install Openproject on Raspian
 
-This protocol is based on the somewhat outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/). By now it has a few issues, but it does spend more time explaining the various steps. 
+This protocol is based on the outdated manual installation protocol that can be found [here](https://docs.openproject.org/installation-and-operations/installation/manual/). By now it has several issues, but it does spend more time explaining the various steps. 
 
 ## Setting up the Raspberry and Raspian Buster
 
@@ -128,7 +128,7 @@ rbenv rehash
 rbenv global 2.7.2
 
 ```
-Will take 15 minutes. 
+This will take 15 minutes. 
 
 Earlier version of the protocol required an older (2.6) version, now 2.7.2 compiles just fine. 
 
@@ -150,11 +150,11 @@ nodenv rehash
 nodenv global 13.7.0
 ```
 
-Will take 1 minute.  
+This will take 1 minute.  
 
 ## Compile and install OpenProject
 
-Careful - the manual installation I linked to above still uses stable/9, the current release is stable/11 (as of Feb 2021). So, using release stable/11 here. Earlir issues with bcrypt and other gems are resolved. 
+Careful - the manual installation I linked to above still uses stable/9, the current release is stable/11 (as of Feb 2021). So, using release stable/11 here. Earlier issues with bcrypt and other gems appear to have resolved themselves. 
 
 ```
 cd ~
@@ -292,18 +292,23 @@ Create the /etc/apache2/sites-available/openproject.conf file:
  
 Edit the /etc/apache2/apache2.conf file:
 
-'''
+```
 <Directory /home/openproject/>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
         Allow from all
 </Directory>
-'''
+```
+
 This might create some security risks, but is required as long as the openproject folder lives in /home/openproject instead of the /var/www/ folders. 
 
 
-Reboot or restart the apache service again. 
+Reboot or restart the apache service again: 
+
+```
+sudo systemctl restart apache2
+```
 
 
 And now: OpenProject should be accessible on **raspberry_pi-IP**:80. The standard login is admin // admin. If this does not work, see **Troubleshooting** below. 
