@@ -313,6 +313,10 @@ sudo systemctl restart apache2
 
 And now: OpenProject should be accessible on **raspberry_pi-IP**:80. The standard login is admin // admin. If this does not work, see **Troubleshooting** below. 
 
+## Email notifications
+
+The template configuration above works, if an 'app specific password' is created in the corresponding google account, and the POP/IMAP option is activated for the same account. See details here: https://support.google.com/accounts/answer/185833?hl=en
+
 ## Congratulations!
 
 
