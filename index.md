@@ -18,11 +18,9 @@ The problem? OpenProject officially does not support the ARM architecture, so an
 
 It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that would be untested as of now, and seems ill advised. During the installation and compilation process, memory usage maxes out at about 3.1 GB. 
 
-## Status (Feb 2020)
+## Status (Feb 2021)
 
-As of now, my OpenProject Raspberry Pi server has an uptime of about 2 weeks, good responsiveness and no issues worth talking about. 
-
-Caveats? Consider this installation protocol an 'alpha' version. It takes 4 to 6 hours to go through, and I seem to invariably run into a problem where (independently of which ruby/npm/gem versions I start out with) OpenProject does initially not compile, usually due to a SASS-related problem. After changing npm/ruby versions a couple of times it suddenly works. I am fully aware that this 'bug' makes this a rather rough guide. 
+I original wrote the instruction in Feb 2020, for OpenProject 10 - and while they (mostly) worked, they were still somewhat buggy in an unpredictable way. I have a received a surprising amount of email asking for the system image, or various fixed, and finally revisited the protocol in 2021. OpenProject recently released version 11 - and somewhat surprisingly, in 2021 this process is a lot smoother. Starting with a Raspian Lite image on a  RPi 4, the whole process was done in a few hours, with minimal issues. The protocol below is updated to reflect the required changes. 
 
 Github doesn't allow me to upload a prepared system image, but if you send me a message I can give a link to a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, change the passwords and you are good to go. 
 
@@ -30,10 +28,7 @@ Or help me fix the last few kinks in the protocol. Any hints & suggestions are a
 
 ## Key issues
 
-* bcrypt 3.1.13 does not build on the Pi, 3.1.12 is fine. See [here](https://github.com/codahale/bcrypt-ruby/issues/201).
-* Apache configuration is [outdated](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/).
-* PostgreSQL user privileges are not set correctly when following the 'official' protocol.
-* Ruby version 2.6.3 and 2.7.0 appear to work, but both require edits to the Gemfile or Gemfile.lock. 2.6.5 might be problematic. 
+* to be populated as discovered
 
 ### How to install Openproject on Raspian
 
@@ -89,7 +84,7 @@ Switch to the PostgreSQL system user and create the database user. The official 
 
 ```
 sudo su - postgres
-createuser -dW openproject
+createuser -drsW openproject
 ```
 Check PostgreSQL users and their privileges. If the CREATE DB privilege is missing, the installation will fail at a later point.
 ```
@@ -128,14 +123,14 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(rbenv init -)"' >> ~/.profile
 source ~/.profile
 git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-MAKE_OPTS="-j 4" rbenv install 2.6.3
+MAKE_OPTS="-j 4" rbenv install 2.7.2
 rbenv rehash
-rbenv global 2.6.3
+rbenv global 2.7.2
 
 ```
 Will take 15 minutes. 
 
-rbenv 2.6.5 and 2.7.0 might work as well. 2.7.0 is too new for OpenProject, unless the 2.7.0 version is forced by editing the OpenProject gem file. 2.6.3 or 2.6.5 are simpler to use, I would recommend 2.6.3 for now. 
+Earlier version of the protocol required an older (2.6) version, now 2.7.2 compiles just fine. 
 
 Check version with
 ```
@@ -159,17 +154,12 @@ Will take 1 minute.
 
 ## Compile and install OpenProject
 
-Careful - the manual installation I linked to above still uses stable/9, the current release is stable/10 (as of Feb 2020). So, using release stable/10 here, and take note of the bcrypt version, 3.1.13 failes to build. Easiest fix is to edit Gemfile.lock and change the 'bcrypt' line to 3.1.12 (instead of 3.1.13 in my case). 
-If using node 2.6.3, edit the Gemfile and change the ruby version from 2.6.5 to 2.6.3. 
+Careful - the manual installation I linked to above still uses stable/9, the current release is stable/11 (as of Feb 2021). So, using release stable/11 here. Earlir issues with bcrypt and other gems are resolved. 
 
 ```
 cd ~
-git clone https://github.com/opf/openproject.git --branch stable/10 --depth 1
+git clone https://github.com/opf/openproject.git --branch stable/11--depth 1
 cd openproject
-nano Gemfile.lock
-**edit the bcrypt line and change the gem version from (probably) 3.1.13 to 3.1.12**
-nano Gemfile
-**edit the ruby line and change the version from (probably) 2.6.5 to 2.6.3**
 gem update --system 
 gem install bundler
 bundle install --deployment --without mysql2 sqlite development test therubyracer docker 
@@ -229,7 +219,7 @@ production:
 Set secret key and store in environmental variable SECRET_KEY_BASE. 
 
 ```
-sudo su -- openproject -login
+su -- openproject -login
 cd ~/openproject
 echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
 source ~/.profile
@@ -279,8 +269,6 @@ sudo systemctl restart apache2
 
 Create the /etc/apache2/sites-available/openproject.conf file:
 ```
-SetEnv EXECJS_RUNTIME Disabled
-
 <VirtualHost *:80>
    ServerName yourdomain.com
    # !!! Be sure to point DocumentRoot to 'public'!
@@ -301,14 +289,22 @@ SetEnv EXECJS_RUNTIME Disabled
 
 </VirtualHost>
 ```
+ 
+Edit the /etc/apache2/apache2.conf file:
 
-Then, still as root perform the fix as described [here](https://lonewolfonline.net/apache-error-invalid-command-expiresactive/)
-```
-ln -s /etc/apache2/mods-available/expires.load /etc/apache2/mods-enabled/
-sudo a2dissite 000-default
-sudo a2ensite openproject
-sudo systemctl restart apache2
-```
+'''
+<Directory /home/openproject/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        Allow from all
+</Directory>
+'''
+This might create some security risks, but is required as long as the openproject folder lives in /home/openproject instead of the /var/www/ folders. 
+
+
+Reboot or restart the apache service again. 
+
 
 And now: OpenProject should be accessible on **raspberry_pi-IP**:80. The standard login is admin // admin. If this does not work, see **Troubleshooting** below. 
 
