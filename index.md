@@ -18,6 +18,14 @@ The problem? OpenProject officially does not support the ARM architecture, so an
 
 It's possible to get OpenProject working on a Raspberry Pi. I highly recommend a RPi4 with 4 GB RAM (or a similar board). It might be possible to get by with the 2 GB version and sufficient swap space, but that would be untested as of now, and seems ill advised. During the installation and compilation process, memory usage maxes out at about 3.1 GB. 
 
+## I just want to give this a go quickly - is there a ready-made system image?
+
+I prepared a Raspian lite-based image in Feb 2021, which should get anyone up and running in half an hour, but has some security issues, unless passwords are changes, etc.
+
+The image file is [here](https://drive.google.com/file/d/1qBzWME8BCVja0HickLo_SOcvsUL5sUEC/view?usp=sharing), around 12gb and should fit any 16gb+ memory card. It does require a RPi4, with ideally 2 or 4gb memory. SSH is enabled (pi//raspberry), OpenProject is still on the default login (admin//admin), and you will have to enable wifi (/etc/wpa-supplicant/wpa-supplicant) or ethernet to connect to the system. Then set up email notificatiosns in OpenProject (see below). 
+
+I'm curious to hear about any issues or success stories!
+
 ## Status (Feb 2021)
 
 I original wrote the instructions in February 2020, for OpenProject 10 - and while they (mostly) worked, they were still somewhat buggy in an unpredictable way. I have received a surprising amount of emails asking for the system image, or various fixes, and finally revisited the protocol in 2021. OpenProject recently released version 11 - and somewhat surprisingly, in 2021 the process is a lot smoother. Starting with a Raspian Lite image on a  RPi 4, the whole process was done in a few hours, with minimal issues. The protocol below is updated to reflect the required changes. 
