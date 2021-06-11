@@ -30,10 +30,7 @@ I'm curious to hear about any issues or success stories!
 
 I original wrote the instructions in February 2020, for OpenProject 10 - and while they (mostly) worked, they were still somewhat buggy in an unpredictable way. I have received a surprising amount of emails asking for the system image, or various fixes, and finally revisited the protocol in 2021. OpenProject recently released version 11 - and somewhat surprisingly, in 2021 the process is a lot smoother. Starting with a Raspian Lite image on a  RPi 4, the whole process was done in a few hours, with minimal issues. The protocol below is updated to reflect the required changes. 
 
-Github doesn't allow me to upload a prepared system image, but if you send me a message I can give a link to a prepared system image with Raspian/OpenProject preinstalled. Just copy that onto a SD card, change the passwords and you are good to go. 
-
-Or help me fix the last few kinks in the protocol. Any hints & suggestions are appreciated. 
-
+There is an ongoing discussion in the OpenProject forum regarding tweaks and fixes: https://community.openproject.org/topics/6873
 ## Key issues
 
 * to be populated as discovered
