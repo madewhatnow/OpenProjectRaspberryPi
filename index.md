@@ -128,14 +128,14 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(rbenv init -)"' >> ~/.profile
 source ~/.profile
 git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-MAKE_OPTS="-j 4" rbenv install 2.7.2
+MAKE_OPTS="-j 4" rbenv install 2.7.4
 rbenv rehash
-rbenv global 2.7.2
+rbenv global 2.7.4
 
 ```
 This will take 15 minutes. 
 
-Earlier version of the protocol required an older (2.6) version, now 2.7.2 compiles just fine. 
+Earlier version of the protocol required an older (2.6) version, now 2.7.4 compiles just fine. 
 
 Check version with
 ```
@@ -149,7 +149,7 @@ git clone https://github.com/OiNutter/nodenv.git ~/.nodenv
 echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.profile
 echo 'eval "$(nodenv init -)"' >> ~/.profile
 source ~/.profile
-git clone git://github.com/OiNutter/node-build.git ~/.nodenv/plugins/node-build
+git clone https://github.com/OiNutter/node-build.git ~/.nodenv/plugins/node-build
 MAKE_OPTS="-j 4" nodenv install 13.7.0
 nodenv rehash
 nodenv global 13.7.0
@@ -163,7 +163,7 @@ Careful - the manual installation I linked to above still uses stable/9, the cur
 
 ```
 cd ~
-git clone https://github.com/opf/openproject.git --branch stable/11--depth 1
+git clone https://github.com/opf/openproject.git --branch stable/11 --depth 1
 cd openproject
 gem update --system 
 gem install bundler
